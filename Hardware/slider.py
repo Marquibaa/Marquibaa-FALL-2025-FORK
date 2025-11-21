@@ -44,7 +44,7 @@ def move_servo(value):
 
 slider = tk.Scale(
     root,
-    from_=0,
+    from_=0,    
     to=180,
     orient='horizontal',
     length=400,
