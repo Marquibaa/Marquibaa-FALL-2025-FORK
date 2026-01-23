@@ -60,9 +60,12 @@ center_axes()
 # -------------------------
 # Robot target
 # -------------------------
-target_position = [0, 0.2, 0.1]
-target_orientation = [-1, 0, 0]
+target_position = np.array([0.0, 0.2, 0.1])
+filtered_target = target_position.copy()
 
+TARGET_ALPHA = 0.15  # 0.1–0.2 is a good range
+
+target_orientation = [-1, 0, 0]
 ik = my_chain.inverse_kinematics(target_position, target_orientation, orientation_mode="Y")
 
 # -------------------------
@@ -110,9 +113,18 @@ def doIK():
 
 
 def move(x, y, z):
-    global target_position
-    target_position = [x, y, z]
+    global target_position, filtered_target
+
+    new_target = np.array([x, y, z])
+
+    filtered_target = (
+        TARGET_ALPHA * new_target
+        + (1.0 - TARGET_ALPHA) * filtered_target
+    )
+
+    target_position = filtered_target.tolist()
     doIK()
+
 
 # -------------------------
 # Models
