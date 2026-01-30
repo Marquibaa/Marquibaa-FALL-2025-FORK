@@ -63,7 +63,9 @@ ik = my_chain.inverse_kinematics(
     orientation_mode="Y"
 )
 
-    
+# -------------------------
+# Declaring the claw state
+# -------------------------
 claw_state = "HAND NOT DETECTED"
 
 # -------------------------
@@ -283,10 +285,9 @@ while cap.isOpened():
         fingers_z = (index.y + middle.y + ring.y + pinky.y) / 4
         fingers_y = (index.z + middle.z + ring.z + pinky.z) / 4
 
-        #FOR THE CLAW
-
-        
-
+        # -------------------------
+        # Claw setup
+        # -------------------------
         thumb = lm[4]
         thumb_x = thumb.x
         thumb_y = thumb.y
@@ -301,7 +302,6 @@ while cap.isOpened():
         else:
             claw_state = "CLAW CLOSED"
 
-
         # -------------------------
         # Hand Size (Depth)
         # -------------------------
@@ -312,14 +312,18 @@ while cap.isOpened():
         )
 
 
-        # FAR
+        # -------------------------
+        # Depth Calibration - FAR AWAY
+        # -------------------------
         if elapsed < CALIB_FAR_TIME:
 
             if DEPTH_MIN is None or hand_size < DEPTH_MIN:
                 DEPTH_MIN = hand_size
 
 
-        # CLOSE
+        # -------------------------
+        # Depth Calibration - CLOSE
+        # -------------------------
         elif elapsed < CALIB_FAR_TIME + CALIB_CLOSE_TIME:
 
             if DEPTH_MAX is None or hand_size > DEPTH_MAX:
@@ -353,7 +357,7 @@ while cap.isOpened():
         }
 
 
-        x_scaled = -fingers_rel["x"]
+        x_scaled = fingers_rel["x"] *-1
         y_scaled = fingers_rel["y"] *- 1 + 0.5
         z_scaled = fingers_rel["z"] *-1 + 1
 
@@ -375,7 +379,9 @@ while cap.isOpened():
             )
 
 
+        # -------------------------
         # Depth Display
+        # -------------------------
         cv2.putText(
             image,
             f"Depth: {y_scaled:.2f}",
@@ -386,8 +392,9 @@ while cap.isOpened():
             2
         )
 
-
-    # Status
+        # -------------------------
+        # Depth and Claw Status Display
+        # -------------------------
     cv2.putText(
         image,
         f'{status} {claw_state}',
