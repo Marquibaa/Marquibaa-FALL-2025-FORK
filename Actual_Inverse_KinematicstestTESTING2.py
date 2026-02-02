@@ -237,14 +237,13 @@ while cap.isOpened():
         status = "CALIBRATION DONE"
 
 
-    neck_ref = None
 
     # -------------------------
     # Neck Reference
     # -------------------------
+    neck_ref = None
 
     if pose_results.pose_landmarks:
-
         lm = pose_results.pose_landmarks.landmark
 
         ls = lm[mp_pose.PoseLandmark.LEFT_SHOULDER]
@@ -252,9 +251,10 @@ while cap.isOpened():
 
         neck_ref = {
             "x": (ls.x + rs.x) / 2,
-            "y": (ls.y + rs.y) / 2,
-            "z": (ls.z + rs.z) / 2
+            "z": (ls.y + rs.y) / 2,   # shoulder height reference
+            "shoulder_y": (ls.y + rs.y) / 2
         }
+
 
 
     # -------------------------
@@ -280,13 +280,7 @@ while cap.isOpened():
         pinky = lm[20]
 
 
-        # -------------------------
-        # Your Axis Fix
-        # -------------------------
 
-        fingers_x = (index.x + middle.x + ring.x + pinky.x) / 4
-        fingers_z = (index.y + middle.y + ring.y + pinky.y) / 4
-        fingers_y = (index.z + middle.z + ring.z + pinky.z) / 4
 
         # -------------------------
         # Claw setup
@@ -350,19 +344,24 @@ while cap.isOpened():
 
 
         # -------------------------
-        # Relative Position
+        # Robot-space Position (Fix A)
         # -------------------------
 
-        fingers_rel = {
-            "x": fingers_x - neck_ref["x"],
-            "y": depth_val,
-            "z": fingers_z - neck_ref["z"]
-        }
+        # Horizontal movement: wrist relative to shoulders
+        rel_x = wrist.x - neck_ref["x"]
+
+        # Depth: from calibrated hand size ONLY
+        rel_y = depth_val
+
+        # Height: wrist height relative to shoulders
+        # (this is the magic line)
+        rel_z = wrist.y - neck_ref["shoulder_y"]
 
 
-        x_scaled = fingers_rel["x"] *-1
-        y_scaled = fingers_rel["y"] *- 1 + 0.5
-        z_scaled = fingers_rel["z"] *-1 + 1
+        x_scaled = -rel_x
+        y_scaled = -rel_y + 0.5
+        z_scaled = -rel_z + 1.0
+
 
 
         # -------------------------

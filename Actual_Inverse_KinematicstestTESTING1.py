@@ -252,8 +252,7 @@ while cap.isOpened():
 
         neck_ref = {
             "x": (ls.x + rs.x) / 2,
-            "y": (ls.y + rs.y) / 2,
-            "z": (ls.z + rs.z) / 2
+            "z": (ls.y + rs.y) / 2
         }
 
 
@@ -284,9 +283,9 @@ while cap.isOpened():
         # Your Axis Fix
         # -------------------------
 
-        fingers_x = (index.x + middle.x + ring.x + pinky.x) / 4
-        fingers_z = (index.y + middle.y + ring.y + pinky.y) / 4
-        fingers_y = (index.z + middle.z + ring.z + pinky.z) / 4
+        fingers_x = lm[0].x
+        fingers_z = lm[0].y
+        fingers_y = lm[0].z
 
         # -------------------------
         # Claw setup
